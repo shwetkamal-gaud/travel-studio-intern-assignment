@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('api/requests')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly requestsService: AppService) { }
+
+  @Post()
+  create(@Body() body: { guestPhone: string; requestText: string }) {
+    return this.requestsService.create(body);
+  }
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getAllPending() {
+    console.log(this.requestsService.getAllPending())
+    return this.requestsService.getAllPending();
   }
 }

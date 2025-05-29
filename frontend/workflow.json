@@ -1,0 +1,132 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ea639196-6fed-430e-a6b4-3f672e5f09a4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        20
+      ],
+      "id": "27ac7145-4ea7-4917-a7b9-108e266795a5",
+      "name": "Webhook",
+      "webhookId": "ea639196-6fed-430e-a6b4-3f672e5f09a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst result = items.map((item) => {\n  return {\n    guestPhone: item?.json?.body?.From,\n    requestText: item?.json?.body?.Body,\n  };\n});\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        20
+      ],
+      "id": "2831a4dc-fa91-43ae-97af-586541fb160e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://purple-pugs-shake.loca.lt/api/requests",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "guestPhone",
+              "value": "={{ $json.guestPhone }}"
+            },
+            {
+              "name": "requestText",
+              "value": "={{ $json.requestText }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        20
+      ],
+      "id": "07ef982c-264e-4bcd-9fb2-c9eb69d74a54",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "from": "={{ $('Webhook').item.json.body.To }}",
+        "to": "={{ $('Webhook').item.json.body.From }}",
+        "toWhatsapp": true,
+        "message": "Request received! Our staff will assist you soon.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        580,
+        20
+      ],
+      "id": "0c8c25c1-531d-4873-b8de-4bbdd52ac835",
+      "name": "Twilio",
+      "credentials": {
+        "twilioApi": {
+          "id": "sHIcobaLZ8xNR3Vb",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e86ceb4-1c35-4497-af8b-dbae3c4ead98",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3398a93a510cbdff35f0afd7d9186db3a7f50eaa6d409432717c601ad0646916"
+  },
+  "id": "7iaqkUA4KEh4OhMt",
+  "tags": []
+}
